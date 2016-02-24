@@ -8,6 +8,7 @@ setup(name='aimmo',
         'django >= 1.8.3, < 1.9.0',
         'django-autoconfig >= 0.3.6, < 1.0.0',
         'django-js-reverse',
+        'docker-py',
     ],
     tests_require=[
         'django-setuptest',
