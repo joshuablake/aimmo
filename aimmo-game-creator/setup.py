@@ -10,6 +10,7 @@ setup(
         'pykube',
     ],
     tests_require=[
+        'httmock',
     ],
     test_suite='tests',
     zip_safe=False,

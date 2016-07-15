@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import logging
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -9,7 +10,7 @@ from subprocess import CalledProcessError
 
 _SCRIPT_LOCATION = os.path.abspath(os.path.dirname(__file__))
 _MANAGE_PY = os.path.join(_SCRIPT_LOCATION, 'example_project', 'manage.py')
-_SERVICE_PY = os.path.join(_SCRIPT_LOCATION, 'aimmo-game', 'service.py')
+_SERVICE_PY = os.path.join(_SCRIPT_LOCATION, 'aimmo-game-creator', 'service.py')
 
 
 if __name__ == '__main__':
@@ -39,16 +40,6 @@ def run_command_async(args):
     return p
 
 
-def cleanup_processes():
-    for p in PROCESSES:
-        try:
-            p.terminate()
-            time.sleep(0.9)
-            p.kill()
-        except:
-            pass
-
-
 def create_superuser_if_missing(username, password):
     from django.contrib.auth.models import User
     try:
@@ -69,14 +60,17 @@ def main():
     server_args = []
     server = run_command_async(['python', _MANAGE_PY, 'runserver'] + server_args)
     time.sleep(2)
-    game = run_command_async(['python', _SERVICE_PY, '127.0.0.1', '5000'])
+    game = run_command_async(['python', _SERVICE_PY])
 
     server.wait()
     game.wait()
 
 
 if __name__ == '__main__':
+    os.setpgrp()
     try:
         main()
     finally:
-        cleanup_processes()
+        os.killpg(0, signal.SIGTERM)
+        time.sleep(0.9)
+        os.killpg(0, signal.SIGKILL)

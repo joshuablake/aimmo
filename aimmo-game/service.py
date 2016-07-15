@@ -110,7 +110,7 @@ def player_data(player_id):
     })
 
 
-def run_game():
+def run_game(port):
     global worker_manager
 
     print("Running game...")
@@ -121,7 +121,8 @@ def run_game():
     WorkerManagerClass = WORKER_MANAGERS[os.environ.get('WORKER_MANAGER', 'local')]
     worker_manager = WorkerManagerClass(
         game_state=game_state,
-        users_url=os.environ.get('GAME_API_URL', 'http://localhost:8000/players/api/games/')
+        users_url=os.environ.get('GAME_API_URL', 'http://localhost:8000/players/api/games/1'),
+        port=port
     )
     worker_manager.start()
     turn_manager.start()
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     socketio.init_app(app, resource=os.environ.get('SOCKETIO_RESOURCE', 'socket.io'))
-    run_game()
+    run_game(int(sys.argv[2]))
     socketio.run(
         app,
         debug=False,
