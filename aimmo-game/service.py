@@ -115,16 +115,14 @@ def run_game(port):
     global worker_manager
 
     print("Running game...")
-    my_map = map_generator.generate_map(pickle.loads(os.environ['settings']))
+    settings = pickle.loads(os.environ['settings'])
+    api_url = os.environ.get('GAME_API_URL', 'http://localhost:8000/players/api/games/1')
+    generator = getattr(map_generator, settings['GENERATOR'])(settings)
     player_manager = AvatarManager()
-    game_state = GameState(my_map, player_manager)
-    turn_manager = TurnManager(game_state=game_state, end_turn_callback=send_world_update)
+    game_state = generator.get_game_state(player_manager)
+    turn_manager = TurnManager(game_state=game_state, end_turn_callback=send_world_update, completion_url=api_url+'/complete/')
     WorkerManagerClass = WORKER_MANAGERS[os.environ.get('WORKER_MANAGER', 'local')]
-    worker_manager = WorkerManagerClass(
-        game_state=game_state,
-        users_url=os.environ.get('GAME_API_URL', 'http://localhost:8000/players/api/games/1'),
-        port=port
-    )
+    worker_manager = WorkerManagerClass(game_state=game_state, users_url=api_url, port=port)
     worker_manager.start()
     turn_manager.start()
 

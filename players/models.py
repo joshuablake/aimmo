@@ -1,21 +1,52 @@
 from base64 import urlsafe_b64encode
 from django.contrib.auth.models import User
 from django.db import models
+from players import app_settings
 from os import urandom
+
+GAME_GENERATORS = [
+    ('Main', 'Open World'),  # Default
+] + [('Level%s' % i, 'Level %s' % i) for i in xrange(1, app_settings.MAX_LEVEL+1)]
 
 
 def generate_auth_token():
     return urlsafe_b64encode(urandom(16))
 
 
+class GameQuerySet(models.QuerySet):
+    def for_user(self, user):
+        return self.filter(models.Q(public=True) | models.Q(can_play=user))
+
+
+class GameManager(models.Manager):
+    def _get_unfiltered_queryset(self):
+        return GameQuerySet(self.model, using=self._db)
+
+    def get_queryset(self):
+        """QuerySet containing all active games."""
+        return self._get_unfiltered_queryset().filter(completed=False)
+
+    def include_inactive(self):
+        """QuerySet containing all games, must be called before any filter methods."""
+        return self._get_unfiltered_queryset()
+
+    def for_user(self, user):
+        """Limit games to those playable by a single user"""
+        return self.get_queryset().for_user(user)
+
+
 class Game(models.Model):
     name = models.CharField(max_length=100)
     auth_token = models.CharField(max_length=24, default=generate_auth_token)
-    owner = models.ForeignKey(User, null=True, related_name='owned_games')
+    owner = models.ForeignKey(User, blank=True, null=True, related_name='owned_games')
     public = models.BooleanField(default=True)
     can_play = models.ManyToManyField(User, related_name='playable_games')
+    completed = models.BooleanField(default=False)
+    main_user = models.ForeignKey(User, blank=True, null=True, related_name='games_for_user')
+    objects = GameManager()
 
     # Game config
+    generator = models.CharField(max_length=20, choices=GAME_GENERATORS, default=GAME_GENERATORS[0][0])
     target_num_cells_per_avatar = models.FloatField(default=16)
     target_num_score_locations_per_avatar = models.FloatField(default=0.5)
     score_despawn_chance = models.FloatField(default=0.02)
@@ -38,7 +69,12 @@ class Game(models.Model):
             'OBSTACLE_RATIO': self.obstacle_ratio,
             'START_HEIGHT': self.start_height,
             'START_WIDTH': self.start_width,
+            'GENERATOR': self.generator,
         }
+
+    def save(self, *args, **kwargs):
+        super(Game, self).full_clean()
+        super(Game, self).save(*args, **kwargs)
 
 
 class Avatar(models.Model):
@@ -49,3 +85,12 @@ class Avatar(models.Model):
 
     class Meta:
         unique_together = ('owner', 'game')
+
+
+class LevelAttempt(models.Model):
+    level_number = models.IntegerField()
+    user = models.ForeignKey(User)
+    game = models.OneToOneField(Game)
+
+    class Meta:
+        unique_together = ('level_number', 'user')

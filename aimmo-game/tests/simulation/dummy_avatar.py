@@ -3,6 +3,16 @@ from simulation.action import MoveAction
 from simulation import direction
 
 
+class EmptyAvatarManager(object):
+    avatarsById = {}
+
+    def remove_avatar(self, id):
+        del self.avatarsById[id]
+
+    def add_avatar(self, id, url, location):
+        self.avatarsById[id] = DummyAvatarRunner(location, id)
+
+
 class DummyAvatarRunner(object):
     def __init__(self, initial_location, player_id):
         # TODO: extract avatar state and state-altering methods into a new class.

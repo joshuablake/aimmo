@@ -6,3 +6,5 @@ GAME_SERVER_LOCATION_FUNCTION = getattr(
     'AIMMO_GAME_SERVER_LOCATION_FUNCTION',
     lambda id: ('http://localhost:%d' % (6001 + int(id) * 1000), '/socket.io'),
 )
+
+MAX_LEVEL = 1

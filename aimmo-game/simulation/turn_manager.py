@@ -40,14 +40,18 @@ class TurnManager(threading.Thread):
     """
     daemon = True
 
-    def __init__(self, game_state, end_turn_callback):
+    def __init__(self, game_state, end_turn_callback, completion_url):
         world_state_provider.set_world(game_state)
         self.end_turn_callback = end_turn_callback
+        self._completion_url = completion_url
         super(TurnManager, self).__init__()
 
     def _update_environment(self, game_state):
         num_avatars = len(game_state.avatar_manager.active_avatars)
         game_state.world_map.reconstruct_interactive_state(num_avatars)
+
+    def _mark_complete(self):
+        requests.post(self._completion_url)
 
     def run_turn(self):
         try:
@@ -70,6 +74,9 @@ class TurnManager(threading.Thread):
                         action.apply(game_state, avatar)
 
             self._update_environment(game_state)
+            if game_state.is_complete():
+                LOGGER.info('Game complete')
+                self._mark_complete()
 
         finally:
             world_state_provider.release_lock()
