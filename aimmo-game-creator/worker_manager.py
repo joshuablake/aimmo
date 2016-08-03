@@ -148,6 +148,7 @@ class LocalWorkerManager(WorkerManager):
         ]
         env = os.environ.copy()
         env['GAME_API_URL'] = 'http://localhost:8000/players/api/games/%s' % game_id
+        env.update(game_data)
         self.workers[game_id] = subprocess.Popen(process_args, cwd=self.worker_directory, env=env)
         worker_url = 'http://%s:%s' % (
             self.host,

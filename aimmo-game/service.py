@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import cPickle as pickle
 import logging
 import os
 import sys
@@ -114,7 +115,7 @@ def run_game(port):
     global worker_manager
 
     print("Running game...")
-    my_map = map_generator.generate_map(10, 10, 0.1)
+    my_map = map_generator.generate_map(pickle.loads(os.environ['settings']))
     player_manager = AvatarManager()
     game_state = GameState(my_map, player_manager)
     turn_manager = TurnManager(game_state=game_state, end_turn_callback=send_world_update)
