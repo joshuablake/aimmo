@@ -10,13 +10,15 @@ install:
   - pip install .
   - pip install coveralls
 script:
-  - python setup.py test
+  - coverage run setup.py test
   - cd aimmo-game
-  - python setup.py test
+  - coverage run setup.py test
   - cd ../aimmo-game-creator
-  - python setup.py test
+  - coverage run setup.py test
   - cd ../aimmo-game-worker
-  - python setup.py test
+  - coverage run setup.py test
+  - cd ..
+  - coverage combine . aimmo-game aimmo-game-worker aimmo-game-creator
 after_success:
   - coveralls
 deploy:
