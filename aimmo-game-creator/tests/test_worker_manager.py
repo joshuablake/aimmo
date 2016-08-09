@@ -40,7 +40,8 @@ class RequestMock(object):
                 'settings': pickle.dumps({
                     'test': i,
                     'test2': 'Settings %s' % i,
-                })
+                }),
+                'auth_token': 'auth_%s' % i,
             } for i in xrange(num_games)
         }
 
@@ -53,7 +54,7 @@ class TestWorkerManager(unittest.TestCase):
     def setUp(self):
         self.worker_manager = ConcreteWorkerManager('http://test')
 
-    def test_correct_url(self):
+    def test_correct_url_requested(self):
         mocker = RequestMock(0)
         with HTTMock(mocker):
             self.worker_manager.update()
@@ -73,6 +74,7 @@ class TestWorkerManager(unittest.TestCase):
                 {'test': i, 'test2': 'Settings %s' % i}
             )
             self.assertEqual(self.worker_manager.added_workers[str(i)]['name'], 'Game %s' % i)
+            self.assertEqual(self.worker_manager.added_workers[str(i)]['auth_token'], 'auth_%s' % i)
 
     def test_remove_games(self):
         mocker = RequestMock(3)
