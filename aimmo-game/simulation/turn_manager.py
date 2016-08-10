@@ -51,7 +51,10 @@ class TurnManager(threading.Thread):
         game_state.world_map.reconstruct_interactive_state(num_avatars)
 
     def _mark_complete(self):
-        requests.post(self._completion_url)
+        LOGGER.info('Marking game complete')
+        response = requests.post(self._completion_url)
+        if response.data != 'Done!':
+            raise ValueError('Unknown response %s when marking game complete' % response.data)
 
     def run_turn(self):
         try:

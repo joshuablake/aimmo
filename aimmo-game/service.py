@@ -18,7 +18,6 @@ from simulation.turn_manager import world_state_provider
 from simulation import map_generator
 from simulation.avatar.avatar_manager import AvatarManager
 from simulation.location import Location
-from simulation.game_state import GameState
 from simulation.turn_manager import TurnManager
 from simulation.worker_manager import WORKER_MANAGERS
 
@@ -129,9 +128,9 @@ def run_game(port):
     generator = getattr(map_generator, settings['GENERATOR'])(settings)
     player_manager = AvatarManager()
     game_state = generator.get_game_state(player_manager)
-    turn_manager = TurnManager(game_state=game_state, end_turn_callback=send_world_update, completion_url=api_url+'/complete/')
+    turn_manager = TurnManager(game_state=game_state, end_turn_callback=send_world_update, completion_url=api_url+'/complete/?auth_token='+os.environ['auth_token'])
     WorkerManagerClass = WORKER_MANAGERS[os.environ.get('WORKER_MANAGER', 'local')]
-    worker_manager = WorkerManagerClass(game_state=game_state, users_url=api_url, port=port)
+    worker_manager = WorkerManagerClass(game_state=game_state, users_url=api_url+'/?auth_token='+os.environ['auth_token'], port=port)
     worker_manager.start()
     turn_manager.start()
 
