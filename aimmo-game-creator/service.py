@@ -49,7 +49,7 @@ def create_game_rc(api, name, environment_variables):
                                         'value': env_value,
                                     } for env_name, env_value in environment_variables.items()
                                 ],
-                                'image': 'ocadotechnology/aimmo-game:latest',
+                                'image': 'ocadotechnology/aimmo-game:test',
                                 'ports': [
                                     {
                                         'containerPort': 5000,

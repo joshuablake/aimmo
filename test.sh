@@ -23,6 +23,7 @@ fi
 
 # Add to Docker
 eval $(./test-bin/minikube docker-env)
+export DOCKER_API_VERSION=1.20
 export DOCKER_API_VERSION=$(docker version --format '{{.Server.APIVersion}}')
 docker build aimmo-game -t ocadotechnology/aimmo-game:test
 docker build aimmo-game-creator -t ocadotechnology/aimmo-game-creator:test
