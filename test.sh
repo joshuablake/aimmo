@@ -22,7 +22,7 @@ find -name "*.py" -exec sed -i "s?https://staging-dot-decent-digit-629.appspot.c
 
 # Start cluster
 if [ "$(./test-bin/minikube status)" != "Running" ]; then
-    ./test-bin/minikube start
+    ./test-bin/minikube start --memory=2048 --cpus=2
 fi
 
 # Add to Docker
