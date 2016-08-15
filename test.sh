@@ -18,7 +18,7 @@ players_url=${ip_array[0]}:8000
 # Use local images
 find -name "*.py" -exec sed -i "s?ocadotechnology/\(.*\):latest?ocadotechnology/\1:test?" {} \;
 find -name "*.yaml" -exec sed -i "s?ocadotechnology/\(.*\):latest?ocadotechnology/\1:test?" {} \;
-find -name "*.py" -exec sed -i "s?staging-dot-decent-digit-629.appspot.com?${players_url}?" {} \;
+find -name "*.py" -exec sed -i "s?https://staging-dot-decent-digit-629.appspot.com/aimmo?http://${players_url}/players?" {} \;
 
 # Start cluster
 if [ "$(./test-bin/minikube status)" != "Running" ]; then
@@ -36,9 +36,10 @@ docker build aimmo-game-worker -t ocadotechnology/aimmo-game-worker:test
 # Nuke then restart
 ./test-bin/kubectl delete rc --all
 ./test-bin/kubectl delete pods --all
+./test-bin/kubectl delete service --all
 ./test-bin/kubectl create -f aimmo-game-creator/rc-aimmo-game-creator.yaml
 
 # Restore files
 find -name "*.py" -exec sed -i "s?ocadotechnology/\(.*\):test?ocadotechnology/\1:latest?" {} \;
 find -name "*.yaml" -exec sed -i "s?ocadotechnology/\(.*\):test?ocadotechnology/\1:latest?" {} \;
-find -name "*.py" -exec sed -i "s?${players_url}?staging-dot-decent-digit-629.appspot.com?" {} \;
+find -name "*.py" -exec sed -i "s?http://${players_url}/players?https://staging-dot-decent-digit-629.appspot.com/aimmo?" {} \;
