@@ -223,7 +223,7 @@ class KubernetesWorkerManager(WorkerManager):
                             },
                         ],
                         'name': 'aimmo-game-worker',
-                        'image': 'ocadotechnology/aimmo-game-worker:test',
+                        'image': 'ocadotechnology/aimmo-game-worker:latest',
                         'ports': [
                             {
                                 'containerPort': 5000,

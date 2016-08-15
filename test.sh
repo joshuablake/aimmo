@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -e
 cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
@@ -12,9 +12,13 @@ if [ ! -d "test-bin" ]; then
     chmod +x test-bin/kubectl
 fi
 
+ip_array=( $(hostname -I) )
+players_url=${ip_array[0]}:8000
+
 # Use local images
 find -name "*.py" -exec sed -i "s?ocadotechnology/\(.*\):latest?ocadotechnology/\1:test?" {} \;
 find -name "*.yaml" -exec sed -i "s?ocadotechnology/\(.*\):latest?ocadotechnology/\1:test?" {} \;
+find -name "*.py" -exec sed -i "s?staging-dot-decent-digit-629.appspot.com?${players_url}?" {} \;
 
 # Start cluster
 if [ "$(./test-bin/minikube status)" != "Running" ]; then
@@ -37,3 +41,4 @@ docker build aimmo-game-worker -t ocadotechnology/aimmo-game-worker:test
 # Restore files
 find -name "*.py" -exec sed -i "s?ocadotechnology/\(.*\):test?ocadotechnology/\1:latest?" {} \;
 find -name "*.yaml" -exec sed -i "s?ocadotechnology/\(.*\):test?ocadotechnology/\1:latest?" {} \;
+find -name "*.py" -exec sed -i "s?${players_url}?staging-dot-decent-digit-629.appspot.com?" {} \;
