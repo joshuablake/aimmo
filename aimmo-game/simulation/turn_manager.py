@@ -61,8 +61,8 @@ class TurnManager(threading.Thread):
                 turn_state = game_state.get_state_for(avatar)
                 try:
                     data = requests.post(avatar.worker_url, json=turn_state).json()
-                except ValueError as err:
-                    LOGGER.info("Failed to get turn result: %s", err)
+                except (requests.exceptions.ConnectionError, ValueError) as err:
+                    LOGGER.info("Failed to get turn result: for user %s", avatar.player_id, exc_info=1)
                 else:
                     try:
                         action_data = data['action']
@@ -83,6 +83,9 @@ class TurnManager(threading.Thread):
 
     def run(self):
         while True:
-            self.run_turn()
-            self.end_turn_callback()
+            try:
+                self.run_turn()
+                self.end_turn_callback()
+            except Exception:
+                LOGGER.exception('Error while running turn')
             time.sleep(0.5)
