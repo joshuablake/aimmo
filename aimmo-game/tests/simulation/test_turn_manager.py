@@ -12,6 +12,9 @@ from .dummy_avatar import MoveNorthDummy
 from .dummy_avatar import MoveEastDummy
 from .dummy_avatar import MoveSouthDummy
 from .dummy_avatar import MoveWestDummy
+from .dummy_avatar import AttackWestDummy
+from .dummy_avatar import AttackNorthDummy
+from .dummy_avatar import AttackEastDummy
 from .dummy_avatar import DummyAvatarManager
 
 
@@ -177,6 +180,16 @@ class TestTurnManager(unittest.TestCase):
         [self.assert_at(avatars[i], locations[i]) for i in range(5)]
         self.run_turn()
         [self.assert_at(avatars[i], locations[i]) for i in range(5)]
+
+    def test_avatars_both_die(self):
+        location = [Location(1, 1), Location(2, 0), Location(1, 0), Location(0, 0)]
+        self.construct_turn_manager([WaitDummy, AttackWestDummy, AttackNorthDummy, AttackEastDummy], location)
+        for i in range(4):
+            self.get_avatar(i).health = 1
+        self.run_turn()
+        print(self.get_avatar(0).events)
+        self.assertEqual(self.get_avatar(0).health, 5)
+
 
 if __name__ == '__main__':
     unittest.main()

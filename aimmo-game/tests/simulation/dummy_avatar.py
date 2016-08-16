@@ -4,7 +4,7 @@ import itertools
 
 from simulation.avatar.avatar_wrapper import AvatarWrapper
 from simulation.avatar.avatar_manager import AvatarManager
-from simulation.action import MoveAction, WaitAction
+from simulation.action import MoveAction, WaitAction, AttackAction
 from simulation.direction import NORTH, EAST, SOUTH, WEST
 
 
@@ -27,6 +27,7 @@ class DummyAvatar(AvatarWrapper):
 
     def die(self, respawn_loc):
         self.location = respawn_loc
+        self.health = 5
         self.times_died += 1
 
     def serialise(self):
@@ -39,6 +40,33 @@ class WaitDummy(DummyAvatar):
     '''
     def handle_turn(self, state_view):
         return WaitAction(self)
+
+
+class AttackDummy(DummyAvatar):
+    '''
+    Avatar that always attacks in one direction.
+    '''
+    def __init__(self, player_id, initial_location, direction):
+        super(AttackDummy, self).__init__(player_id, initial_location)
+        self._direction = direction
+
+    def handle_turn(self, state_view):
+        return AttackAction(self, self._direction.dict)
+
+
+class AttackEastDummy(AttackDummy):
+    def __init__(self, player_id, initial_location):
+        super(AttackEastDummy, self).__init__(player_id, initial_location, EAST)
+
+
+class AttackWestDummy(AttackDummy):
+    def __init__(self, player_id, initial_location):
+        super(AttackWestDummy, self).__init__(player_id, initial_location, WEST)
+
+
+class AttackNorthDummy(AttackDummy):
+    def __init__(self, player_id, initial_location):
+        super(AttackNorthDummy, self).__init__(player_id, initial_location, NORTH)
 
 
 class MoveDummy(DummyAvatar):

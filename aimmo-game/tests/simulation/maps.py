@@ -23,6 +23,7 @@ class InfiniteMap(WorldMap):
     def __init__(self):
         self._cell_cache = {}
         [self.get_cell(Location(x, y)) for x in range(5) for y in range(5)]
+        self.respawns = [Location(1, 0), Location(2, 1)]
 
     def is_on_map(self, target_location):
         self.get_cell(target_location)
@@ -33,6 +34,9 @@ class InfiniteMap(WorldMap):
 
     def get_cell(self, location):
         return self._cell_cache.setdefault(location, Cell(location))
+
+    def get_random_spawn_location(self):
+        return self.respawns.pop()
 
 
 class EmptyMap(WorldMap):
