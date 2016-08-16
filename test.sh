@@ -43,3 +43,8 @@ docker build aimmo-game-worker -t ocadotechnology/aimmo-game-worker:test
 find -name "*.py" -exec sed -i "s?ocadotechnology/\(.*\):test?ocadotechnology/\1:latest?" {} \;
 find -name "*.yaml" -exec sed -i "s?ocadotechnology/\(.*\):test?ocadotechnology/\1:latest?" {} \;
 find -name "*.py" -exec sed -i "s?http://${players_url}/players?https://staging-dot-decent-digit-629.appspot.com/aimmo?" {} \;
+
+# Run django
+./example_project/manage.py migrate
+./example_project/manage.py collectstatic
+./example_project/manage.py runserver 0.0.0.0:8000
