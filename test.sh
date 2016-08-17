@@ -38,9 +38,10 @@ docker build aimmo-game-worker -t ocadotechnology/aimmo-game-worker:test
 ./test-bin/kubectl delete rc --all
 ./test-bin/kubectl delete pods --all
 ./test-bin/kubectl delete services --all
+set +e # Command fails if secret already exists (eg previous run)
+./test-bin/kubectl create secret generic creator --from-literal=auth=insecure-creator-auth-token
 
 # Wait for kubernetes service
-set +e
 ./test-bin/kubectl get service kubernetes
 while [ $? != 0 ]; do
     echo "Waiting for kubernetes service"
