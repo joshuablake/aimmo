@@ -193,13 +193,13 @@ class KubernetesWorkerManager(WorkerManager):
                     'replicas': 1,
                     'selector': {
                         'app': 'aimmo-game',
-                        'game': id,
+                        'game_id': id,
                     },
                     'template': {
                         'metadata': {
                             'labels': {
                                 'app': 'aimmo-game',
-                                'id': id,
+                                'game_id': id,
                             },
                         },
                         'spec': {
