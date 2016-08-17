@@ -247,13 +247,13 @@ class KubernetesWorkerManager(WorkerManager):
                     'name': "game-%s" % id,
                     'labels': {
                         'app': 'aimmo-game',
-                        'game': id,
+                        'game_id': id,
                     },
                 },
                 'spec': {
                     'selector': {
                         'app': 'aimmo-game',
-                        'game': id,
+                        'game_id': id,
                     },
                     'ports': [
                         {
