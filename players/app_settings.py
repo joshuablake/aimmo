@@ -13,7 +13,7 @@ def get_url(game):
             raise
     else:
         return (output.strip(), '/game/%s/socket.io' % game)
-    return ('http://localhost:%d' % (6001 + int(id) * 1000), '/socket.io')
+    return ('http://localhost:%d' % (6001 + int(game) * 1000), '/socket.io')
 
 
 #: URL function for locating the game server, takes one parameter `game`
