@@ -64,6 +64,10 @@ Even with these basic mechanics, there is quite a lot of complexity in creating 
 
 `python example_project/manage.py delete_generated_players`
 
+### Under Kubernetes (Linux only)
+* Install [Docker](https://docs.docker.com/v1.8/installation). As a one-liner (assuming pre-requisites installed): `curl -sSL https://get.docker.com/ | sh`.
+* Run `./test.sh`.
+
 ## Testing Locally
 *`./all_tests.py` will run all tests (note that this is several pages of output).
 * `--coverage` option generates coverage data using coverage.py

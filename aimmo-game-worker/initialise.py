@@ -4,10 +4,15 @@ import os
 import sys
 import json
 import requests
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def main(args, url, auth_token):
     data_dir = args[1]
+    LOGGER.debug('Data dir is %s', data_dir)
 
     data = requests.get(url, params={'auth_token': auth_token}).json()
 
@@ -20,4 +25,5 @@ def main(args, url, auth_token):
         avatar_file.write(code)
 
 if __name__ == '__main__':
-    main(sys.argv, url=os.environ['DATA_URL'], auth_token=os.environ['AUTH_TOKEN'])
+    logging.basicConfig(level=logging.DEBUG)
+    main(sys.argv, url=os.environ['DATA_URL'], auth_token=os.environ['AUTH_TOKEN']))
