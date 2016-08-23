@@ -19,7 +19,6 @@ KUBECTL = os.path.join(TEST_BIN, 'kubectl%s' % FILE_SUFFIX)
 MINIKUBE = os.path.join(TEST_BIN, 'minikube%s' % FILE_SUFFIX)
 DOCKER_FOLDER = os.path.join(TEST_BIN, 'docker')
 DOCKER = os.path.join(DOCKER_FOLDER, 'docker%s' % FILE_SUFFIX)
-CREATOR_YAML = os.path.join(TEST_BIN, 'rc-aimmo-game-creator.yaml')
 
 
 def create_test_bin():
@@ -95,12 +94,11 @@ def get_ip():
     return IP
 
 
-def create_creator_yaml():
-    orig_path = os.path.join(BASE_DIR, 'aimmo-game-creator', 'rc-aimmo-game-creator.yaml')
-    with open(orig_path) as orig_file:
+def create_yaml(filepath):
+    with open(filepath) as orig_file:
         orig_content = orig_file.read()
     new_content = orig_content.replace('latest', 'test').replace('https://staging-dot-decent-digit-629.appspot.com/aimmo', 'http://%s:8000/players' % get_ip())
-    with open(CREATOR_YAML, 'w') as new_file:
+    with open(os.path.join(TEST_BIN, os.path.basename(filepath)), 'w') as new_file:
         new_file.write(new_content)
 
 
@@ -121,7 +119,7 @@ def build_docker_images():
         name = match.group(1)
         value = match.group(2)
         os.environ[name] = value
-    dirs = ('aimmo-game', 'aimmo-game-creator', 'aimmo-game-worker')
+    dirs = ('aimmo-game', 'aimmo-game-creator', 'aimmo-game-worker', 'aimmo-reverse-proxy')
     for dir in dirs:
         path = os.path.join(BASE_DIR, dir)
         run_command([DOCKER, 'build', '-t', 'ocadotechnology/%s:test' % dir, path])
@@ -130,9 +128,12 @@ def build_docker_images():
 def restart_pods():
     print('Restarting pods')
     run_command([KUBECTL, 'delete', 'rc', '--all'])
+    run_command([KUBECTL, 'delete', 'deployments', '--all'])
     run_command([KUBECTL, 'delete', 'pods', '--all'])
     run_command([KUBECTL, 'delete', 'service', '--all'])
-    run_command([KUBECTL, 'create', '-f', CREATOR_YAML])
+    for resource in ('rc-aimmo-game-creator', 'deploy-aimmo-reverse-proxy', 'service-aimmo-reverse-proxy'):
+        yaml = os.path.join(TEST_BIN, '%s.yaml' % resource)
+        run_command([KUBECTL, 'create', '-f', yaml])
 
 
 def start():
@@ -142,7 +143,9 @@ def start():
     download_kubectl()
     download_minikube()
     download_docker()
-    create_creator_yaml()
+    create_yaml(os.path.join(BASE_DIR, 'aimmo-game-creator', 'rc-aimmo-game-creator.yaml'))
+    create_yaml(os.path.join(BASE_DIR, 'aimmo-reverse-proxy', 'service-aimmo-reverse-proxy.yaml'))
+    create_yaml(os.path.join(BASE_DIR, 'aimmo-reverse-proxy', 'deploy-aimmo-reverse-proxy.yaml'))
     start_cluster()
     build_docker_images()
     restart_pods()
