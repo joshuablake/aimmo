@@ -5,7 +5,7 @@ import os
 
 def get_url(game):
     if os.environ.get('AIMMO_MODE', '') == 'minikube':
-        output = subprocess.check_output(['./test-bin/minikube', 'service', 'game-%s' % game, '--url'])
+        output = subprocess.check_output(['./test-bin/minikube', 'service', 'aimmo-reverse-proxy', '--url'])
         return (output.strip(), '/game/%s/socket.io' % game)
     else:
         return ('http://localhost:5000', '/socket.io')
